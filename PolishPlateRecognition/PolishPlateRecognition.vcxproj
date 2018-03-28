@@ -79,8 +79,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(SolutionDir)3rdParty\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)3rdParty\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)3rdParty\opencv\build\x64\vc15\lib;D:\Code\C++\Biblioteki\boost_1_66_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Code\C++\Biblioteki\boost_1_66_0;$(SolutionDir)3rdParty\opencv\build\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,8 +90,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
-    <LibraryPath>$(SolutionDir)3rdParty\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)3rdParty\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)3rdParty\opencv\build\x64\vc15\lib;D:\Code\C++\Biblioteki\boost_1_66_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Code\C++\Biblioteki\boost_1_66_0;$(SolutionDir)3rdParty\opencv\build\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -160,10 +160,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ClassDescriptor.h" />
+    <ClInclude Include="CharacterRecognitionNetwork.h" />
+    <ClInclude Include="ImagePipeline.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="LabelledImage.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClassDescriptor.cpp" />
+    <ClCompile Include="CharacterRecognitionNetwork.cpp" />
+    <ClCompile Include="ImagePipeline.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -171,6 +178,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="LabelledImage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
