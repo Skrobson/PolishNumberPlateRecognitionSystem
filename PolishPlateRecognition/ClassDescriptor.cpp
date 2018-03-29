@@ -27,4 +27,9 @@ char ClassDescriptor::getCharacter(size_t index)
 		return ' ';
 }
 
+const std::string & ClassDescriptor::getDictionary()
+{
+	return classesDictionary;
+}
+
 

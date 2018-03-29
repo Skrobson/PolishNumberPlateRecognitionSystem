@@ -12,6 +12,8 @@ public:
 
 	static char getCharacter(size_t index);
 
+	static const std::string& getDictionary();
+
 private:
 
 	static const std::string classesDictionary;
