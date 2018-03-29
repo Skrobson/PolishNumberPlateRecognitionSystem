@@ -4,15 +4,14 @@
 
 #include <algorithm>
 
-CharacterRecognitionNetwork::CharacterRecognitionNetwork()
+CharacterRecognitionNetwork::CharacterRecognitionNetwork(int inputCells)
 {
 	ann = cv::ml::ANN_MLP::create();
-	cv::Mat_<int> layers(4, 1) ;
-	layers(0 ) = 32*32;     // input
-	layers(1) = 164;  // hidden
-	layers(2) = 77;  // hidden
+	cv::Mat_<int> layers(1, 3) ;
+	layers(0) = inputCells;     // input
+	layers(1) = 77;  // hidden
 	auto outputSize = ClassDescriptor::getClassesCount();
-	layers(3) = outputSize;      // output, 1 pin per class.
+	layers(2) = outputSize;      // output, 1 pin per class.
 	ann->setLayerSizes(layers);
 	ann->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM,1,1);
 	ann->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 300, 0.0001));

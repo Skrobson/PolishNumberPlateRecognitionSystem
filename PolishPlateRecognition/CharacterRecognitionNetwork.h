@@ -4,7 +4,7 @@
 class CharacterRecognitionNetwork
 {
 public:
-	CharacterRecognitionNetwork();
+	CharacterRecognitionNetwork(int inputCells);
 	CharacterRecognitionNetwork(const std::string& filename);
 
 	void train(const LabelledImage& data);
