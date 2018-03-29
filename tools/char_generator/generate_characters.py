@@ -45,8 +45,8 @@ folder='shared/Digits_1f1'
 number_of_images=32
 dispaly_count=1
 
-colorBackground = "white"   
-colorText = "black"
+colorBackground = "black"   
+colorText = "white"
 
 for font_name in font_names:
 
