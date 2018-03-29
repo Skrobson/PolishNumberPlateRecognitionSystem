@@ -13,6 +13,8 @@ public:
 	
 	char predict(const cv::Mat& picture);
 
+	const cv::Ptr<cv::ml::ANN_MLP> getNetwork() const { return ann; }
+
 private:
 
 	cv::Ptr<cv::ml::ANN_MLP> ann;

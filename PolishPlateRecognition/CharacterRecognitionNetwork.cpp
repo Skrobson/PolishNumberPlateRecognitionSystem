@@ -14,9 +14,12 @@ CharacterRecognitionNetwork::CharacterRecognitionNetwork()
 	auto outputSize = ClassDescriptor::getClassesCount();
 	layers(3) = outputSize;      // output, 1 pin per class.
 	ann->setLayerSizes(layers);
-	ann->setActivationFunction(cv::ml::ANN_MLP::RELU);
+	ann->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM,1,1);
 	ann->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 300, 0.0001));
 	ann->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
+	ann->setBackpropMomentumScale(0.05f);
+	ann->setBackpropWeightScale(0.05f);
+	
 }
 
 CharacterRecognitionNetwork::CharacterRecognitionNetwork(const std::string & filename)
