@@ -15,6 +15,5 @@ private:
 	cv::Mat classCode;
 	char className;
 	cv::Mat data;
-
 };
 

@@ -60,11 +60,12 @@ LabelledImage ImagePipeline::loadLabelledImage(const std::string & filename) con
 	auto img = loadImage(filename);
 
 	cv::Mat convertedImg;
-	img.convertTo(convertedImg, CV_32F);
-	convertedImg = convertedImg.reshape(0, 1);
+	//img.convertTo(convertedImg, CV_32F);
+	//convertedImg = convertedImg.reshape(0, 1);
 	char className = filename[(filename.find_last_of('_')) - 1];
 
-	return LabelledImage(std::move(convertedImg), className );
+	//return LabelledImage(std::move(convertedImg), className );
+	return LabelledImage(std::move(img), className);
 }
 
 bool ImagePipeline::isPNGFile(const std::string & file)
