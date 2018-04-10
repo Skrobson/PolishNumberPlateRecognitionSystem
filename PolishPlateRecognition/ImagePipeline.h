@@ -25,6 +25,7 @@ private:
 	std::vector<std::string> files;
 	boost::filesystem::path rootDirectory;
 
+
 	bool isPNGFile(const std::string& file);
 };
 

@@ -33,12 +33,18 @@ void CharacterRecognitionNetwork::train(const LabelledImage & data)
 	std::cout << train << std::endl;
 }
 
+void CharacterRecognitionNetwork::train(const cv::Mat & samples, const cv::Mat & responses)
+{
+	ann->train(samples, cv::ml::ROW_SAMPLE, responses);
+}
+
+
 void CharacterRecognitionNetwork::save(const std::string & fileName)
 {
 	ann->save(fileName);
 }
 
-char CharacterRecognitionNetwork::predict(const cv::Mat & picture)
+char CharacterRecognitionNetwork::predict(const cv::Mat & picture)const
 {
 	
 	std::vector<float> res;
