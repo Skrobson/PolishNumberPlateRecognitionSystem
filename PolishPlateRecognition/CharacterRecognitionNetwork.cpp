@@ -19,8 +19,7 @@ CharacterRecognitionNetwork::CharacterRecognitionNetwork(int inputCells)
 	ann->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER + cv::TermCriteria::EPS, 300, 0.0001));
 	ann->setTrainMethod(cv::ml::ANN_MLP::BACKPROP, 0.0001);
 	ann->setBackpropMomentumScale(0.05f);
-	ann->setBackpropWeightScale(0.05f);
-	
+	ann->setBackpropWeightScale(0.05f);	
 }
 
 CharacterRecognitionNetwork::CharacterRecognitionNetwork(const std::string & filename)

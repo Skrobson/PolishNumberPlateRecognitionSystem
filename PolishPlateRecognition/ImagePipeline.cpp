@@ -52,7 +52,7 @@ cv::Mat ImagePipeline::loadImage(const std::string & filename) const
 		std::cerr << "WARNING: Could not read image." << std::endl;
 
 	}
-	return img;
+	return img.clone();
 }
 
 LabelledImage ImagePipeline::loadLabelledImage(const std::string & filename) const

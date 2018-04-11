@@ -6,6 +6,7 @@ public:
 	LabelledImage(cv::Mat&& data, char className);
 	LabelledImage(const cv::Mat& data, char className);
 
+	cv::Mat getDesacriptor()const;
 	cv::Mat getData()const;
 	cv::Mat getClassCode()const;
 	char getClassName()const;
@@ -14,6 +15,7 @@ private:
 
 	cv::Mat classCode;
 	char className;
-	cv::Mat data;
+	cv::Mat image;
+	cv::Mat descriptors;
 };
 
