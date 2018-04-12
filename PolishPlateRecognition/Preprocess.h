@@ -7,6 +7,11 @@ public:
 
 	cv::Mat preprocessTrainData(const cv::Mat& img);
 private:
+
+	cv::Mat calcHOG(const cv::Mat& img);
 	cv::HOGDescriptor hog;
+
+	int x = 16;
+	int y = 32;
 };
 
