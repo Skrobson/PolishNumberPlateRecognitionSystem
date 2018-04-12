@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <boost\filesystem.hpp>
 #include <opencv2\opencv.hpp>
-
 #include "LabelledImage.h"
+
+#include <filesystem>
+//#include <boost\filesystem.hpp>
 
 class ImagePipeline
 {
@@ -23,7 +24,7 @@ public:
 private:
 
 	std::vector<std::string> files;
-	boost::filesystem::path rootDirectory;
+	std::experimental::filesystem::path rootDirectory;
 
 
 	bool isPNGFile(const std::string& file);

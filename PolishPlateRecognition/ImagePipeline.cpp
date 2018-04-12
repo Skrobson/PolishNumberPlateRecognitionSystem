@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "ImagePipeline.h"
 #include <iostream>
-namespace fs = boost::filesystem;
 
+//c++17
+namespace fs = std::experimental::filesystem;
+
+//boost
+//namespace fs = boost::filesystem;
 ImagePipeline::ImagePipeline()
 {
 }
@@ -28,14 +32,15 @@ void ImagePipeline::setDirectory(const std::string& dir)
 			if (fs::is_regular_file(file))
 			{
 				auto filePath = file.string();
-
-				if (isPNGFile(filePath))
-					files.push_back(std::move(filePath));
+				files.push_back(std::move(filePath));
 			}
 		}
 	}
 	else
-		throw fs::filesystem_error("Bad directory", tmpPath, boost::system::error_code());
+		throw fs::filesystem_error("Bad directory", tmpPath, std::error_code());
+
+		//throw fs::filesystem_error("Bad directory", tmpPath, boost::system::error_code());
+
 	
 }
 
