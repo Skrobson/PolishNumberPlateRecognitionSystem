@@ -19,12 +19,12 @@ import string
 #font_names = ["OpenSans-Regular.ttf", "Mothproof_Script.ttf", "Calligraffiti.ttf"]
 font_names = ["arklatrs.ttf"]
 font_path = "fonts/{}"
-font_size = 26 
+font_size = 22 
 
 
 #how many digits to generate
 #random_digits=1
-img_size=(32,32)#width, height (good for one digit)
+img_size=(24,32)#width, height (good for one digit)
 
 #how many digits to generate
 random_digits=1
