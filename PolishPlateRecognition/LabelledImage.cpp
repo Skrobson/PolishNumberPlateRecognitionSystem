@@ -1,23 +1,23 @@
 #include "stdafx.h"
 #include "LabelledImage.h"
 #include "ClassDescriptor.h"
-#include "Preprocess.h"
+#include "CharacterPreprocess.h"
 
 
 LabelledImage::LabelledImage(cv::Mat&& data, char className) : image(data), className(className)
 {
 	classCode = ClassDescriptor::getClassCode(className);
 
-	Preprocess prep;
-	descriptors = prep.preprocessTrainData(image);
+	CharacterPreprocess prep;
+	descriptors = prep.preprocessImage(image);
 }
 
 LabelledImage::LabelledImage(const cv::Mat & data, char className) : image(data), className(className)
 {
 	classCode = ClassDescriptor::getClassCode(className);
 
-	Preprocess prep;
-	descriptors = prep.preprocessTrainData(image);
+	CharacterPreprocess prep;
+	descriptors = prep.preprocessImage(image);
 }
 
 cv::Mat LabelledImage::getDesacriptor() const

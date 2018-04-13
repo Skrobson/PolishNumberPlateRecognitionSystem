@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#include "Preprocess.h"
+#include "CharacterPreprocess.h"
 
 
-Preprocess::Preprocess() : x(16), y(32), hog(
+CharacterPreprocess::CharacterPreprocess() : x(16), y(32), hog(
 	cv::Size(16, 32), //winSize
 	cv::Size(8, 16), //blocksize
 	cv::Size(4, 8), //blockStride,
@@ -18,7 +18,7 @@ Preprocess::Preprocess() : x(16), y(32), hog(
 {
 }
 
-cv::Mat Preprocess::preprocessTrainData(const cv::Mat& img)
+cv::Mat CharacterPreprocess::preprocessImage(const cv::Mat& img)
 {
 	cv::Mat resizedImg;
 	cv::resize(img, resizedImg, cv::Size(x,y));
@@ -44,7 +44,7 @@ cv::Mat Preprocess::preprocessTrainData(const cv::Mat& img)
 	return output.clone();
 }
 
-cv::Mat Preprocess::calcHOG(const cv::Mat & img)
+cv::Mat CharacterPreprocess::calcHOG(const cv::Mat & img)
 {
 	std::vector<float> descriptors;
 	hog.compute(img, descriptors);

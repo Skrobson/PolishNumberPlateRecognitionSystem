@@ -1,11 +1,13 @@
 #pragma once
 #include <opencv2/opencv.hpp>
-class Preprocess
+class CharacterPreprocess
 {
 public:
-	Preprocess();
-
-	cv::Mat preprocessTrainData(const cv::Mat& img);
+	CharacterPreprocess();
+	/**
+	Preprocess pipeline for treshold image of char
+	*/
+	cv::Mat preprocessImage(const cv::Mat& img);
 private:
 
 	cv::Mat calcHOG(const cv::Mat& img);
@@ -14,4 +16,5 @@ private:
 	int x = 16;
 	int y = 32;
 };
+
 

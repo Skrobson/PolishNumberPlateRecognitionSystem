@@ -14,7 +14,7 @@ cv::Mat ClassDescriptor::getClassCode(char className)
 
 	auto index = classesDictionary.find_first_of(className);
 	if (index != std::string::npos)
-		code.at<float>(index) = 1.0f;
+		code.at<float>(static_cast<int>(index)) = 1.0f;
 	
 	return code;
 }
