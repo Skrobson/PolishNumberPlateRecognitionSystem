@@ -163,8 +163,10 @@
     <ClInclude Include="ClassDescriptor.h" />
     <ClInclude Include="CharacterRecognitionNetwork.h" />
     <ClInclude Include="ImagePipeline.h" />
+    <ClInclude Include="ImageProcessing.h" />
     <ClInclude Include="Plate.h" />
     <ClInclude Include="CharacterPreprocess.h" />
+    <ClInclude Include="PlateDetector.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="LabelledImage.h" />
@@ -173,9 +175,11 @@
     <ClCompile Include="ClassDescriptor.cpp" />
     <ClCompile Include="CharacterRecognitionNetwork.cpp" />
     <ClCompile Include="ImagePipeline.cpp" />
+    <ClCompile Include="ImageProcessing.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Plate.cpp" />
     <ClCompile Include="CharacterPreprocess.cpp" />
+    <ClCompile Include="PlateDetector.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
