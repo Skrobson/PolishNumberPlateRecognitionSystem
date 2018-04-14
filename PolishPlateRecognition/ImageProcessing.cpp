@@ -104,7 +104,6 @@ std::vector<cv::RotatedRect> findRectangles2(const cv::Mat & image)
 cv::Point2f computeIntersect(const cv::Vec4i& a,const cv::Vec4i& b)
 {
 	int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3], x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
-	float denom;
 
 	if (float d = ((float)(x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4)))
 	{
