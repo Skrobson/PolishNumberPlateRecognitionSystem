@@ -20,10 +20,11 @@ CharacterPreprocess::CharacterPreprocess() : x(16), y(32), hog(
 
 cv::Mat CharacterPreprocess::preprocessImage(const cv::Mat& img)
 {
-	cv::Mat resizedImg;
-	cv::resize(img, resizedImg, cv::Size(x,y));
+	cv::Mat output = deskew(img);
+	
+	cv::resize(output, output, cv::Size(x,y));
 
-	cv::Mat output= deskew(resizedImg);
+	
 	output = calcHOG(output);
 
 	return output.clone();
