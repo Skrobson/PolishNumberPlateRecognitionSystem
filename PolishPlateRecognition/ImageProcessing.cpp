@@ -26,13 +26,15 @@ std::vector<cv::RotatedRect> findRectangles(const cv::Mat & image)
 {
 	cv::Mat drawing = cv::Mat::zeros(image.size(), CV_8UC3);
 	cv::Mat grayImg;
-	cv::cvtColor(image, grayImg , CV_BGR2GRAY);	//Gray image
-
+	cv::Mat img;
+	image.convertTo(img, -1, 0.5f,-10);
+	cv::cvtColor(img, grayImg , CV_BGR2GRAY);	//Gray image
+	cv::GaussianBlur(grayImg, grayImg, cv::Size(0, 0), 1, 1);
 	cv::Mat treshImg;
 	cv::threshold(grayImg, treshImg, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
 
-	
-	
+	cv::imshow("tresh", treshImg);
+
 	// find contours (if always so easy to segment as your image, you could just add the black/rect pixels to a vector)
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
@@ -47,7 +49,7 @@ std::vector<cv::RotatedRect> findRectangles(const cv::Mat & image)
 	
 	for (int i = 0; i < contours.size(); i++)
 	{
-		cv::Scalar color = cv::Scalar(255, 255, 255);
+		cv::Scalar color = cv::Scalar(255);
 		drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, cv::Point());
 		
 		float ctArea = cv::contourArea(contours[i]);
@@ -57,7 +59,8 @@ std::vector<cv::RotatedRect> findRectangles(const cv::Mat & image)
 			biggestContourIdx = i;
 		}
 	}
-	detectLines(drawing);
+	cv::Mat detectLinesMat = drawing.clone();
+	
 	// if no contour found
 	if (biggestContourIdx < 0)
 	{
@@ -86,9 +89,10 @@ std::vector<cv::RotatedRect> findRectangles(const cv::Mat & image)
 	}
 	
 	// display
-	cv::imshow("input", image);
+	cv::imshow("input", img);
 	cv::imshow("drawing", drawing);
 	cv::waitKey(0);
+	detectLines(detectLinesMat);
 	return rectangles;
 }
 
@@ -130,10 +134,11 @@ cv::Mat correctGamma(const cv::Mat& img, double gamma) {
 std::vector<cv::Vec4i> detectLines(const cv::Mat & contours)
 {
 	cv::Mat drawing = cv::Mat::zeros(contours.size(), CV_8UC3);
-	cv::Mat img(contours);
-	cv::cvtColor(img, img, CV_BGR2GRAY);
+	cv::Mat img ;
+	cv::cvtColor(contours, img, CV_BGR2GRAY);
 	
-	cv::blur(img, img, cv::Point(3, 3));
+	//cv::blur(img, img, cv::Point(3, 3));
+	
 	cv::threshold(img, img, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
 	cv::Canny(img, img,70, 200, 3);
 
