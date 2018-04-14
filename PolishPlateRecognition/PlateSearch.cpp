@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PlateSearch.h"
+#include "ImageProcessing.h"
 
 
 PlateSearch::PlateSearch()
@@ -18,6 +19,8 @@ PlateSearch::PlateSearch(String path)
 		Size size(image.size().width / 2, image.size().height / 2);
 		resize(image, image, size);
 	}
+
+
 	//cv::imshow("original", image);
 	//cv::waitKey();
 }
@@ -149,6 +152,8 @@ void PlateSearch::findPlate()
 			cvtColor(resultResized, grayResult, CV_BGR2GRAY);
 			blur(grayResult, grayResult, Size(3, 3));
 			equalizeHist(grayResult, grayResult);
+			imshow("LL", grayResult);
+			waitKey();
 			cut(grayResult);
 			//namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
 			//imshow("Display window", grayResult);
