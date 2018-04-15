@@ -8,35 +8,33 @@ public:
 	PlateDetector();
 
 	Plate detect(const cv::Mat& img);
-
+	void showSteps(const std::string& winName);
 private:
-
+	void findRects();
 	void preprocess();
+	void sobel(cv::Mat& img);
+	bool verifyPlateSize(const RotatedRect& possiblePlate);
+	cv::Mat cropRect(cv::RotatedRect & rect);
+	bool verifyPossiblePlates(cv::Mat& plate);
+
+
+	float computeAverageHeight(std::vector<RotatedRect>& rects);
+	std::vector<cv::Mat> findChars(cv::Mat&);
+	bool verifyCharacterSize(const RotatedRect& possiblePlate);
+	bool secondCharacterVerification(const RotatedRect& possiblePlate , float avgHeight);
+
+
+	std::vector<cv::RotatedRect> possiblePlates;
+	std::vector<cv::Mat> possiblePlatesMats;
 
 	cv::Mat originalImage;
-	cv::Mat img_threshold;
+	cv::Mat wbImage;
+	cv::Mat blurImage;
+	cv::Mat tresholdImage;
+	cv::Mat grayImage;
+	cv::Mat sobelImage;
+	cv::Mat cannyImage;
+	cv::Mat contoursImage;
+
 };
 
-//bool verifySizes(cv::RotatedRect candidate)
-//{
-//	float error = 0.4;
-//	//Spain car plate size: 52x11 aspect 4,7272
-//	//const float aspect = 4.7272;
-//	constexpr float aspect = 520 / 114;
-//	//Set a min and max area. All other patches are discarded
-//	int min = 15 * aspect * 15; // minimum area
-//	int max = 125 * aspect * 125; // maximum area
-//								  //Get only patches that match to a respect ratio.
-//	float rmin = aspect - aspect * error;
-//	float rmax = aspect + aspect * error;
-//
-//	float r = (float)candidate.size.width / (float)candidate.size.height;
-//	if (r < 1)
-//		r = 1 / r;
-//	if ((r < rmin || r > rmax)) {
-//		return false;
-//	}
-//	else {
-//		return true;
-//	}
-//}

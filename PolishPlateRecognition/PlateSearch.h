@@ -25,6 +25,7 @@ public:
 private:
 	Mat correctGamma(Mat& img, double gamma);
 	void findPlate();
+	bool isPlate(Mat img);
 	void cut(Mat input);
 	bool verifySizes(RotatedRect candidate);
 	Mat img_gray;
