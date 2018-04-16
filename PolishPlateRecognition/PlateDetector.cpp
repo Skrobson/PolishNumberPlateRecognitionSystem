@@ -209,15 +209,22 @@ float PlateDetector::computeAverageHeight(std::vector<RotatedRect>& rects)
 		avg += height;
 	}
 	heights.sort();
-	std::map<float, int> median;
+	std::map<int, int> median;
 	for (auto num : heights)
-		median[num] += 1;
+		median[std::round(num)] += 1;
+	
+		
 
-	//auto medianValue = std::max_element(median.begin(), median.end());
-	//std::cout << "median" <<;
+	auto medianValue = std::max_element(median.begin(), median.end(), 
+		[](const std::pair<int, int>& p1, const std::pair<int, int>& p2)->bool {
+		return p1.second < p2.second;
+	});
+
+	std::cout << "median" << medianValue->first<< " " << medianValue->second<<std::endl;
 	avg /= rects.size();
-
-	return avg;
+	avg += medianValue->first;
+	avg /= 2;
+	return medianValue->first;
 }
 
 std::vector<cv::Mat> PlateDetector::findChars(cv::Mat & plate)
@@ -253,12 +260,12 @@ std::vector<cv::Mat> PlateDetector::findChars(cv::Mat & plate)
 		if (verifyCharacterSize(boundingBox))
 		{
 			// draw the rotated rect
-			/*cv::Point2f corners[4];
+			cv::Point2f corners[4];
 			boundingBox.points(corners);
 			cv::line(character, corners[0], corners[1], cv::Scalar(0, 0, 255));
 			cv::line(character, corners[1], corners[2], cv::Scalar(0, 0, 255));
 			cv::line(character, corners[2], corners[3], cv::Scalar(0, 0, 255));
-			cv::line(character, corners[3], corners[0], cv::Scalar(0, 0, 255));*/
+			cv::line(character, corners[3], corners[0], cv::Scalar(0, 0, 255));
 
 			rectangles.push_back(std::move(boundingBox));
 			std::cout << boundingBox.center.x << "x" << boundingBox.center.y << " " <<
@@ -288,10 +295,10 @@ std::vector<cv::Mat> PlateDetector::findChars(cv::Mat & plate)
 				cv::Point2f points[4];
 				rect.points(points);
 
-				cv::line(character, points[0], points[1], cv::Scalar(0, 0, 255));
-				cv::line(character, points[1], points[2], cv::Scalar(0, 0, 255));
-				cv::line(character, points[2],points[3], cv::Scalar(0, 0, 255));
-				cv::line(character, points[3],points[0], cv::Scalar(0, 0, 255));
+				cv::line(character, points[0], points[1], cv::Scalar(0, 255,0));
+				cv::line(character, points[1], points[2], cv::Scalar(0, 255,0));
+				cv::line(character, points[2],points[3], cv::Scalar(0, 255, 0));
+				cv::line(character, points[3],points[0], cv::Scalar(0, 255, 0));
 			}
 				
 		}
