@@ -33,9 +33,6 @@
     <ClInclude Include="LabelledImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Plate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterPreprocess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,7 +42,10 @@
     <ClInclude Include="ImageProcessing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlateSearch.h">
+    <ClInclude Include="PossiblePlate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,9 +68,6 @@
     <ClCompile Include="LabelledImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Plate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CharacterPreprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,7 +77,10 @@
     <ClCompile Include="ImageProcessing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PlateSearch.cpp">
+    <ClCompile Include="PossiblePlate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
