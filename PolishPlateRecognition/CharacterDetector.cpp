@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CharacterDetector.h"
+#include "ImageProcessing.h"
 
 using namespace cv;
 
@@ -7,34 +8,34 @@ CharacterDetector::CharacterDetector()
 {
 }
 
-void CharacterDetector::detect(const cv::Mat& posiblePlate)
+std::vector<cv::Mat> CharacterDetector::detect(const cv::Mat& posiblePlate)
 {
 	originalPlateImage = posiblePlate.clone();
-	findCharacters();
+	preprocess(originalPlateImage);
+	valid = findCharacters();
 
+	return characters;
 }
 
-cv::Mat CharacterDetector::preprocess(const cv::Mat & originalImage)
+void CharacterDetector::preprocess(const cv::Mat& originalImage)
 {
 	cv::Mat grayPlate;
 	cv::cvtColor(originalPlateImage, grayPlate, CV_BGR2GRAY);
-	cv::threshold(grayPlate, grayPlate, 150, 255, CV_THRESH_OTSU + CV_THRESH_BINARY_INV);
+	cv::threshold(grayPlate, tresholdPlateImage, 150, 255, CV_THRESH_OTSU + CV_THRESH_BINARY_INV);
 
 	//equalizeHist(grayPlate, grayPlate);
 
-	return grayPlate.clone();
 }
 
-void CharacterDetector::findCharacters()
+bool CharacterDetector::findCharacters()
 {
-	cv::Mat grayPlate = preprocess(originalPlateImage);
-
+	
 	//finding contours
-	cv::Mat character = cv::Mat::zeros(grayPlate.size(), CV_8UC3);;
+	cv::Mat character = cv::Mat::zeros(tresholdPlateImage.size(), CV_8UC3);;
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	//
-	cv::findContours(grayPlate, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	cv::findContours(tresholdPlateImage, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	
 
 	for (int i = 0; i < contours.size(); i++)
@@ -43,7 +44,7 @@ void CharacterDetector::findCharacters()
 		drawContours(character, contours, i, color, 1, 8, hierarchy, 0, cv::Point());
 	}
 
-	std::vector<cv::RotatedRect> validChars;
+	std::list<cv::RotatedRect> validChars;
 	std::vector<cv::RotatedRect> discartedChars;
 
 	for (auto& con : contours)
@@ -62,14 +63,10 @@ void CharacterDetector::findCharacters()
 
 			validChars.push_back(std::move(boundingBox));
 			possibleChars.push_back(boundingBox);
-			std::cout << boundingBox.center.x << "x" << boundingBox.center.y << " " <<
-				boundingBox.size.width << "x" << boundingBox.size.height << std::endl;
 		}
 		else
 		{
 			possibleChars.push_back(boundingBox);
-			//std::cout << boundingBox.center.x<<"x"<< boundingBox.center.y << " " << 
-			//	boundingBox.size.width << "x" << boundingBox.size.height << std::endl;
 		}
 	}
 	std::cout << "<<<<<<<<<<" << std::endl;
@@ -77,13 +74,15 @@ void CharacterDetector::findCharacters()
 	//second chance
 	if (validChars.size() >= 4) //7)
 	{
-		std::list<RotatedRect> characters;
 		auto avgH = computeMedianHeight(validChars);
+
+		validChars.clear();
+
 		for (cv::RotatedRect & ch : possibleChars)
 		{
 			if (verifyCharacterSizeByMedianHeight(ch, avgH))
 			{
-				characters.push_back(ch);
+				validChars.push_back(ch);
 				//draw
 				cv::Point2f points[4];
 				ch.points(points);
@@ -94,18 +93,29 @@ void CharacterDetector::findCharacters()
 				cv::line(character, points[3], points[0], cv::Scalar(0, 255, 0));
 			}
 		}
-		possibleChars = characters;
+		
 	}
-
-	//sort horizontally
-	//check line through centers
-
-	cv::imshow("p", grayPlate);
-	cv::waitKey();
+	//debug
+	//cv::imshow("p", tresholdPlateImage);
+	//cv::waitKey();
 
 
-	cv::imshow("p", character);
-	cv::waitKey();
+	//cv::imshow("p", character);
+	//cv::waitKey();
+
+	if (validChars.size() > 8)
+		return false;
+
+	else if (validChars.size() < 7)
+		return false;
+	else if (verifyByLineTroughCenters(validChars))
+	{
+		extractCharacters(validChars);
+		return true;
+	}
+	return false;
+
+
 }
 
 bool CharacterDetector::verifyCharacterSize(const cv::RotatedRect & possibleChar, size_t plateHeight)
@@ -140,12 +150,11 @@ bool CharacterDetector::verifyCharacterSize(const cv::RotatedRect & possibleChar
 	{
 		if (angle > 30 || (angle > -60 && angle < -30))
 			return false;
-		//std::cout << angle << std::endl;
 		return true;
 	}
 }
 
-size_t CharacterDetector::computeMedianHeight(std::vector<cv::RotatedRect>& chars)
+size_t CharacterDetector::computeMedianHeight(std::list<cv::RotatedRect>& chars)
 {
 	std::list<float> heights;
 	
@@ -167,9 +176,6 @@ size_t CharacterDetector::computeMedianHeight(std::vector<cv::RotatedRect>& char
 		return p1.second < p2.second;
 	});
 
-
-	std::cout << "median" << medianValue->first << " " << medianValue->second << std::endl;
-
 	return medianValue->first;
 }
 
@@ -183,33 +189,74 @@ bool CharacterDetector::verifyCharacterSizeByMedianHeight(const cv::RotatedRect 
 	auto min = medianHeight - medianHeight * error;
 	auto max = medianHeight + medianHeight * error;
 
+	float angle = possibleChar.angle;
 	if (height > max || height < min)
+		return false;
+
+	if (angle > 30 || (angle > -60 && angle < -30))
 		return false;
 
 	return true;
 }
 
+bool CharacterDetector::verifyByLineTroughCenters(std::list<cv::RotatedRect>& chars)
+{
+	typedef std::list<cv::RotatedRect>::iterator it;
+	auto checkCenters = [](it first, it last) {
+		auto lineParams = computeStraithLineEquation(first->center, last->center);
+
+		for (it i = first; i == last; ++i)
+		{
+			float d = distancePointLine(i->center, lineParams.first, lineParams.second);
+			float h = std::max(i->size.height, i->size.width);
+			if (d > 0.3*h)
+				return false;
+		}
+		return true;
+	};
+
+	chars.sort([](const cv::RotatedRect& ch1, const cv::RotatedRect& ch2)->bool {
+		return ch1.center.x < ch2.center.x;
+	});
+
+	if (chars.size() == 7)
+	{
+		return checkCenters(chars.begin(), --chars.end());
+	}
+	else
+	{
+		if (!checkCenters(chars.begin(), --(--chars.end())))
+		{
+			chars.pop_front();
+			return checkCenters(chars.begin(), --chars.end());
+		}	
+	}
+	return false;
+}
+
+std::vector<cv::Mat> CharacterDetector::extractCharacters(std::list<cv::RotatedRect>& possibleChars)
+{
+	for (auto & ch : possibleChars)
+	{
+		cv::Mat c = cropChar(ch);
+		cv::cvtColor(c, c, CV_BGR2GRAY);
+		cv::threshold(c, c, 150, 255, CV_THRESH_OTSU + CV_THRESH_BINARY_INV);
+
+		characters.push_back(std::move(c));
+	}
+
+	return characters;
+}
+
 cv::Mat CharacterDetector::cropChar(const cv::RotatedRect & character)
 {
-	cv::Size rSize(character.size.width, character.size.height);
-	float r = (float)rSize.width / (float)rSize.height;
-	float angle = character.angle;
-
-	if (r < 1)
-		angle = 90 + angle;
-	Mat rotmat = getRotationMatrix2D(character.center, angle, 1);
-	//Create and rotate image
-	Mat rotatedImage;
-	warpAffine(originalPlateImage, rotatedImage, rotmat, originalPlateImage.size(), CV_INTER_CUBIC);
-
-	if (r < 1)
-		swap(rSize.width, rSize.height);
+	float height = std::max(character.size.width, character.size.height);
+	float width = std::min(character.size.width, character.size.height);
+	cv::Size rSize(width * 1.1 , height * 1.2);
 
 	Mat cropedImage;
-	getRectSubPix(rotatedImage, rSize, character.center, cropedImage);
 
-
-	//possiblePlatesMats.push_back(std::move(cropedImage));
+	getRectSubPix(originalPlateImage, rSize, character.center, cropedImage);
 
 	return cropedImage.clone();
 }

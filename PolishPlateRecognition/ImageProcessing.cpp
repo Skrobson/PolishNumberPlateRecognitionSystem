@@ -37,6 +37,34 @@ cv::Point2f computeIntersect(const cv::Vec4i& a,const cv::Vec4i& b)
 		return cv::Point2f(-1, -1);
 }
 
+std::pair<float, float> computeStraithLineEquation(const cv::Point2f & p1, const cv::Point2f & p2)
+{
+	float x1 = p1.x;
+	float y1 = p1.y;
+	float x2 = p2.x;
+	float y2 = p2.y;
+
+	float a;
+	float b; 
+
+	float y = y1 - y2;
+	float x = x1 - x2;
+
+	a = y / x;
+
+	b = y1 - x1 * a;	
+
+	return std::make_pair(a, b);
+}
+
+float distancePointLine(const cv::Point2f & p, float a, float b, float c)
+{
+	float numerator = std::fabs(a* p.x + b * p.y + c);
+	float denominator = std::sqrt(a*a + b*b);
+	float d = numerator / denominator;
+	return d;
+}
+
 
 cv::Mat correctGamma(const cv::Mat& img, double gamma) {
 	double inverse_gamma = 1.0 / gamma;

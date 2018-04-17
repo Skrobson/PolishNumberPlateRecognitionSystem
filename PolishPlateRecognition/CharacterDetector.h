@@ -5,30 +5,36 @@ class CharacterDetector
 public:
 	CharacterDetector();
 
-	void detect(const cv::Mat& posiblePlate);
+	std::vector<cv::Mat>detect(const cv::Mat& posiblePlate);
 	
 	bool isValid() { return valid; }
 
-	std::vector<cv::Mat> extractCharacters() { return characters; }
+	std::vector<cv::Mat> getCharacters() { return characters; }
 private:
 	bool valid = false;
 
-	cv::Mat preprocess(const cv::Mat& originalImage);
+	void preprocess(const cv::Mat& originalImage);
 
-	void findCharacters();
+	bool findCharacters();
 
 	bool verifyCharacterSize(const cv::RotatedRect & possibleChar, size_t plateHeight);
 
-	size_t computeMedianHeight(std::vector<cv::RotatedRect>& chars);
+	size_t computeMedianHeight(std::list<cv::RotatedRect>& chars);
 
 	bool verifyCharacterSizeByMedianHeight(const cv::RotatedRect &  possibleChar, float medianHeight);
+
+	bool verifyByLineTroughCenters(std::list<cv::RotatedRect>& chars);
+
+	std::vector<cv::Mat> extractCharacters(std::list<cv::RotatedRect>& possibleChars);
 
 	//moze przeniesc osobno, taka sama funkcja jest w plateDetector
 	cv::Mat cropChar(const cv::RotatedRect& character);
 
 	cv::Mat originalPlateImage;
+	cv::Mat tresholdPlateImage;
 
 	std::list<cv::RotatedRect> possibleChars;
+
 	std::vector<cv::Mat> characters;
 };
 
