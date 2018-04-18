@@ -3,6 +3,7 @@
 #include "ClassDescriptor.h"
 
 #include <algorithm>
+#include "CharacterPreprocess.h"
 
 CharacterRecognitionNetwork::CharacterRecognitionNetwork(int inputCells)
 {
@@ -45,18 +46,20 @@ void CharacterRecognitionNetwork::save(const std::string & fileName)
 	ann->save(fileName);
 }
 
-char CharacterRecognitionNetwork::predict(const cv::Mat & picture)const
+std::tuple<char,float, std::vector<float>> CharacterRecognitionNetwork::predict(const cv::Mat & picture)const
 {
-	
+	CharacterPreprocess prep;
 	std::vector<float> res;
+
+
 	ann->predict(picture, res);
 	
 	auto resultCharacter = std::max_element(res.begin(), res.end());
 	auto index = std::distance(res.begin(), resultCharacter);
 
-	
-	return ClassDescriptor::getCharacter(index);
+	auto predicted = ClassDescriptor::getCharacter(index);
 
+	return std::make_tuple(predicted,*resultCharacter, std::move(res));
 }
 
 

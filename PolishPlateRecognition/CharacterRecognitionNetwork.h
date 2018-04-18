@@ -1,5 +1,6 @@
 #pragma once
 #include <opencv2/opencv.hpp>
+#include <tuple>
 #include "LabelledImage.h"
 class CharacterRecognitionNetwork
 {
@@ -12,9 +13,8 @@ public:
 
 	void save(const std::string& fileName);
 	
-	char predict(const cv::Mat& picture) const;
 
-	const cv::Ptr<cv::ml::ANN_MLP> getNetwork() const { return ann; }
+	std::tuple<char,float, std::vector<float>> predict(const cv::Mat& picture) const;
 
 private:
 

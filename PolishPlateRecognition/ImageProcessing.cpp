@@ -22,89 +22,9 @@ cv::Mat deskew(const cv::Mat & image)
 	return imgOut.clone();
 }
 
-std::vector<cv::RotatedRect> findRectangles(const cv::Mat & image)
-{
-	cv::Mat drawing = cv::Mat::zeros(image.size(), CV_8UC3);
-	cv::Mat grayImg;
-	cv::Mat img;
-	image.convertTo(img, -1, 0.5f,-10);
-	cv::cvtColor(img, grayImg , CV_BGR2GRAY);	//Gray image
-	cv::GaussianBlur(grayImg, grayImg, cv::Size(0, 0), 1, 1);
-	cv::Mat treshImg;
-	cv::threshold(grayImg, treshImg, 0, 255, CV_THRESH_OTSU + CV_THRESH_BINARY);
-
-	cv::imshow("tresh", treshImg);
-
-	// find contours (if always so easy to segment as your image, you could just add the black/rect pixels to a vector)
-	std::vector<std::vector<cv::Point>> contours;
-	std::vector<cv::Vec4i> hierarchy;
-	//
-	cv::findContours(treshImg, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-	
-	// Draw contours and find biggest contour (if there are other contours in the image, we assume the biggest one is the desired rect)
-	// drawing here is only for demonstration!
-	int biggestContourIdx = -1;
-	float biggestContourArea = 0;
-	
-	for (int i = 0; i < contours.size(); i++)
-	{
-		cv::Scalar color = cv::Scalar(255);
-		drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, cv::Point());
-		
-		float ctArea = cv::contourArea(contours[i]);
-		if (ctArea > biggestContourArea)
-		{
-			biggestContourArea = ctArea;
-			biggestContourIdx = i;
-		}
-	}
-	cv::Mat detectLinesMat = drawing.clone();
-	
-	// if no contour found
-	if (biggestContourIdx < 0)
-	{
-		std::cout << "no contour found" << std::endl;
-		return std::vector<cv::RotatedRect>();
-	}
-
-	std::vector<cv::RotatedRect> rectangles;
-
-	for (auto& con : contours)
-	{
-		// compute the rotated bounding rect of the biggest contour! (this is the part that does what you want/need)
-		cv::RotatedRect boundingBox = cv::minAreaRect(con);
-		// one thing to remark: this will compute the OUTER boundary box, so maybe you have to erode/dilate if you want something between the ragged lines
-
-		rectangles.push_back(boundingBox);
-
-		// draw the rotated rect
-		cv::Point2f corners[4];
-		boundingBox.points(corners);
-		cv::line(drawing, corners[0], corners[1], cv::Scalar(0, 0, 255));
-		cv::line(drawing, corners[1], corners[2], cv::Scalar(0, 0, 255));
-		cv::line(drawing, corners[2], corners[3], cv::Scalar(0, 0,255));
-		cv::line(drawing, corners[3], corners[0], cv::Scalar(0, 0, 255));
-
-	}
-	
-	// display
-	cv::imshow("input", img);
-	cv::imshow("drawing", drawing);
-	cv::waitKey(0);
-	detectLines(detectLinesMat);
-	return rectangles;
-}
-
-std::vector<cv::RotatedRect> findRectangles2(const cv::Mat & image)
-{
-	return std::vector<cv::RotatedRect>();
-}
-
 cv::Point2f computeIntersect(const cv::Vec4i& a,const cv::Vec4i& b)
 {
 	int x1 = a[0], y1 = a[1], x2 = a[2], y2 = a[3], x3 = b[0], y3 = b[1], x4 = b[2], y4 = b[3];
-	float denom;
 
 	if (float d = ((float)(x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4)))
 	{
@@ -116,6 +36,35 @@ cv::Point2f computeIntersect(const cv::Vec4i& a,const cv::Vec4i& b)
 	else
 		return cv::Point2f(-1, -1);
 }
+
+std::pair<float, float> computeStraithLineEquation(const cv::Point2f & p1, const cv::Point2f & p2)
+{
+	float x1 = p1.x;
+	float y1 = p1.y;
+	float x2 = p2.x;
+	float y2 = p2.y;
+
+	float a;
+	float b; 
+
+	float y = y1 - y2;
+	float x = x1 - x2;
+
+	a = y / x;
+
+	b = y1 - x1 * a;	
+
+	return std::make_pair(a, b);
+}
+
+float distancePointLine(const cv::Point2f & p, float a, float b, float c)
+{
+	float numerator = std::fabs(a* p.x + b * p.y + c);
+	float denominator = std::sqrt(a*a + b*b);
+	float d = numerator / denominator;
+	return d;
+}
+
 
 cv::Mat correctGamma(const cv::Mat& img, double gamma) {
 	double inverse_gamma = 1.0 / gamma;
@@ -187,3 +136,142 @@ std::vector<cv::Vec4i> detectLines(const cv::Mat & contours)
 
 	return std::vector<cv::Vec4i>();
 }
+
+
+
+
+
+
+
+
+
+//void PlateSearch::findPlate()
+//{
+//	vector<RotatedRect> rects = findRectangles(image);
+//
+//
+//
+//	Mat result;
+//
+//	for (int i = 0; i < rects.size(); i++) {
+//
+//		if (rects[i].size.width > 1 && rects[i].size.height > 1)
+//		{
+//			//Get rotation matrix
+//			float r = (float)rects[i].size.width / (float)rects[i].size.height;
+//			float angle = rects[i].angle;
+//			if (r < 1)
+//				angle = 90 + angle;
+//			Mat rotmat = getRotationMatrix2D(rects[i].center, angle, 1);
+//			//Create and rotate image
+//			Mat img_rotated;
+//			warpAffine(image, img_rotated, rotmat, image.size(), CV_INTER_CUBIC);
+//			//Crop image
+//			Size rect_size = rects[i].size;
+//			if (r < 1)
+//				swap(rect_size.width, rect_size.height);
+//			Mat img_crop;
+//			getRectSubPix(img_rotated, rect_size, rects[i].center, img_crop);
+//			Mat resultResized;
+//			resultResized.create(33, 144, CV_8UC3);
+//			resize(img_crop, resultResized, resultResized.size(), 0, 0, INTER_CUBIC);
+//			//Equalize cropped image
+//			Mat grayResult;
+//			cvtColor(resultResized, grayResult, CV_BGR2GRAY);
+//			blur(grayResult, grayResult, Size(3, 3));
+//			equalizeHist(grayResult, grayResult);
+//			imshow("LL", grayResult);
+//			waitKey();
+//			cut(grayResult);
+//		}
+//
+//	}
+//}
+
+
+//void PlateSearch::cut(Mat input)
+//{
+//	Mat img_threeshold;
+//	Mat grey;
+//
+//	grey = correctGamma(input, 1);
+//	threshold(grey, img_threeshold, 60, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C);
+//	//equalizeHist(img_threeshold, img_threeshold);
+//
+//	Size s = img_threeshold.size();
+//
+//	bool detected_start = false;
+//	bool detected_end = false;
+//	bool detected = false;
+//
+//	vector<int> start;
+//	vector<int> stop;
+//	int height = s.height;
+//	bool detInColumn = false, detCont = false;
+//	for (int x = 0; x < s.width; x++)
+//	{
+//
+//		for (int y = 2; (y <= height - 2) && (detInColumn == false); y++)
+//		{
+//			Scalar colour = img_threeshold.at<uchar>(Point(x, y));
+//			if (colour.val[0] == 255) { // znaleziono
+//				detInColumn = true;
+//			}
+//		}
+//		if ((detInColumn == true) && (detCont == false)) {
+//			start.push_back(x);
+//			detCont = true;
+//
+//		}
+//		else if ((detInColumn == false) && (detCont == true)) {
+//			stop.push_back(x);
+//			detCont = false;
+//		}
+//		detInColumn = false;
+//	}
+//
+//	if (start.size() > stop.size())
+//	{
+//		stop.push_back(img_threeshold.size().width);
+//	}
+//
+//	int wordsCounter = (start.size() <= stop.size() ? start.size() : stop.size());
+//
+//	int maxWidth = 0;
+//	{
+//		for (int i = 0; i < wordsCounter; i++)
+//		{
+//			if (maxWidth < stop[i] - start[i]) maxWidth = stop[i] - start[i];
+//		}
+//
+//	}
+//
+//
+//	if (wordsCounter > 5 && wordsCounter < 10) {
+//		for (int i = 0; i < wordsCounter; i++) {
+//			Mat cropedImage;
+//			if (i == 0 && (start[i] <= 0)) {
+//				cropedImage = img_threeshold(Rect(start[i], 0, stop[i] - start[i] + 2, height));
+//			}
+//			else if (i == wordsCounter && stop[i] <= (stop[i] - start[i] + 2))
+//			{
+//				cropedImage = img_threeshold(Rect(start[i] - 2, 0, stop[i], height));
+//			}
+//			else {
+//				cropedImage = img_threeshold(Rect(start[i] - 2, 0, stop[i] - start[i] + 2, height));
+//			}
+//			//imshow("color result", cropedImage);
+//			if (cropedImage.size().width > 3 && cropedImage.size().width < 30)
+//			{
+//				//String nazwa = "c:\\test\\";
+//				//nazwa += std::to_string(time(0));
+//				//nazwa += std::to_string(i);
+//				//nazwa += ".jpg";
+//				//imwrite(nazwa, cropedImage);
+//				number.push_back(cropedImage);
+//			}
+//			//waitKey(0);
+//		}
+//	}
+//	//imshow("color result", img_threeshold);
+//}

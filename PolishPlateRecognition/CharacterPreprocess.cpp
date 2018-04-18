@@ -21,8 +21,8 @@ CharacterPreprocess::CharacterPreprocess() : x(16), y(32), hog(
 cv::Mat CharacterPreprocess::preprocessImage(const cv::Mat& img)
 {
 	cv::Mat output = deskew(img);
-	
-	cv::resize(output, output, cv::Size(x,y));
+
+	cv::resize(output, output, cv::Size(x,y),0,0, cv::INTER_NEAREST);
 
 	
 	output = calcHOG(output);
