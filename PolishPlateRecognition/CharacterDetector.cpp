@@ -185,6 +185,9 @@ bool CharacterDetector::verifyCharacterSizeByMedianHeight(const cv::RotatedRect 
 
 	auto size = possibleChar.size;
 	auto height = std::max(size.height, size.width);
+	auto width = std::min(size.height, size.width);
+	if (width < 1)
+		return false;
 
 	auto min = medianHeight - medianHeight * error;
 	auto max = medianHeight + medianHeight * error;

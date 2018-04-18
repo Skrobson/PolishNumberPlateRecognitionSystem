@@ -5,8 +5,8 @@ class PlateDetector
 public:
 	PlateDetector();
 
-	void detect(const cv::Mat& img);
-	void showSteps(const std::string& winName);
+	std::vector<cv::Mat> detect(const cv::Mat& img);
+	cv::Mat showSteps();
 private:
 	void findRects();
 	void preprocess();

@@ -8,7 +8,7 @@ PlateDetector::PlateDetector()
 {
 }
 
-void PlateDetector::detect(const cv::Mat & img)
+std::vector<cv::Mat> PlateDetector::detect(const cv::Mat& img)
 {
 	originalImage = img.clone();
 	preprocess();
@@ -19,45 +19,35 @@ void PlateDetector::detect(const cv::Mat & img)
 	{
 		possiblePlatesMats.push_back(cropRect(rect));
 	}
-	CharacterDetector det;
-	for (cv::Mat & plate : possiblePlatesMats)
-	{
-		det.detect(plate);
-		
-	}
 
-
+	return possiblePlatesMats;
 }
 
-void PlateDetector::showSteps(const std::string & winName)
+cv::Mat PlateDetector::showSteps()
 {
 	int w = originalImage.size().width;
 	int h = originalImage.size().height;
-	cv::namedWindow(winName);
-	cv::Mat win_mat(cv::Size(w * 2 , h *2), CV_8UC3);
+
+	cv::Mat winMat(cv::Size(w * 2 , h *2), CV_8UC3);
 	cv::Mat color;
-	originalImage.copyTo(win_mat(cv::Rect(0, 0, w, h)));
+	originalImage.copyTo(winMat(cv::Rect(0, 0, w, h)));
 
-	cv::cvtColor(tresholdImage, color, cv::COLOR_GRAY2BGR);
-	color.copyTo(win_mat(cv::Rect(0, h, w, h)));
-	contoursImage.copyTo(win_mat(cv::Rect(w,0, w, h)));
+	//cv::cvtColor(tresholdImage, color, cv::COLOR_GRAY2BGR);
+	//color.copyTo(winMat(cv::Rect(0, h, w, h)));
+	contoursImage.copyTo(winMat(cv::Rect(w,0, w, h)));
 
-	cv::cvtColor(cannyImage, color, cv::COLOR_GRAY2BGR);
-	color.copyTo(win_mat(cv::Rect(w, h, w, h)));
+	//cv::cvtColor(cannyImage, color, cv::COLOR_GRAY2BGR);
+	//color.copyTo(winMat(cv::Rect(w, h, w, h)));
 	try
 	{
-		cv::resize(win_mat, win_mat, cv::Size(1200, 800));
-		moveWindow(winName, 0, 0);
-		imshow(winName, win_mat);
-
-		cv::waitKey(0);
-		destroyWindow(winName);
+		cv::resize(winMat, winMat, cv::Size(1200, 800));
 	}
 	catch (std::exception* e)
 	{
-		std::cerr << "cant show imgs. " <<e->what() <<  std::endl;
+		return winMat;
 	}
 
+	return winMat;
 }
 
 void PlateDetector::findRects()
@@ -159,7 +149,7 @@ bool PlateDetector::verifyPlateSize(const cv::RotatedRect & possiblePlate)
 	{
 		if (angle > 30 || (angle > -60 && angle <-30))
 			return false;
-		std::cout << angle << std::endl;
+
 		return true;
 	}
 }
